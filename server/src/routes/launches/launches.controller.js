@@ -9,7 +9,7 @@ function httpGetAllLaunches(req, res){ // Change the data to array. manipulate t
 function httpAddNewLaunch(req, res){
     const launch = req.body;
 
-    if(!launch.mission || !launch.rocket || !launch.launchDate || !launch.destination){
+    if(!launch.mission || !launch.rocket || !launch.launchDate || !launch.target){
         return res.status(400).json({
             error: "Mission required Launch Property",
 

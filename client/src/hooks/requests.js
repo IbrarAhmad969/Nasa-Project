@@ -8,9 +8,9 @@ async function httpGetPlanets() {
 
 // Load launches, sort by flight number, and return as JSON.
 async function httpGetLaunches() {
- const response = await fetch(`${API_URL}/launches`)
- const fetchedLaunches = await response.json();
-  return fetchedLaunches.sort((a, b)=>{
+  const response = await fetch(`${API_URL}/launches`)
+  const fetchedLaunches = await response.json();
+  return fetchedLaunches.sort((a, b) => {
     return a.flightNumber - b.flightNumber;
   })
 
@@ -25,11 +25,11 @@ async function httpSubmitLaunch(launch) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(launch),
-    });
-  } catch(err) {
+    })
+  } catch (error) {
     return {
-      ok: false,
-    };
+      ok: false
+    }
   }
 }
 
@@ -39,7 +39,7 @@ async function httpAbortLaunch(id) {
     return await fetch(`${API_URL}/launches/${id}`, {
       method: "delete",
     });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     return {
       ok: false,
