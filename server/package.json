@@ -3,14 +3,19 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodemon src/index.js"
+    "test": "jest",
+    "start": "nodemon src/index.js",
+    "test-start": "jest --start"
+
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "Nasa Mission Control API",
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "jest": "^30.0.5",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.4"
   },
   "dependencies": {
     "cors": "^2.8.5",
