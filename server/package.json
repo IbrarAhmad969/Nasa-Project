@@ -5,8 +5,8 @@
   "scripts": {
     "test": "jest",
     "start": "nodemon src/index.js",
-    "test-start": "jest --start"
-
+    "test-start": "jest --start",
+    "cluster": "pm2 start src/index.js -i max"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +21,7 @@
     "cors": "^2.8.5",
     "csv-parse": "^6.1.0",
     "express": "^5.1.0",
-    "morgan": "^1.10.1"
+    "morgan": "^1.10.1",
+    "pm2": "^6.0.8"
   }
 }

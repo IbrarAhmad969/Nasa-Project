@@ -5,11 +5,15 @@
   "scripts": {
     "install-server": "npm install --prefix server",
     "install-client": "npm install --prefix client",
-    "install": "npm run install-server && npm run install-client", 
+    "install": "npm run install-server && npm run install-client",
     "server": "npm start --prefix server",
     "client": "npm start --prefix client",
+    "build": "npm run build --prefix client",
+    "cluster": "npm run cluster --prefix server",
+
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "deploy": "npm run build --prefix client && npm start --prefix server",
+    "deploy": "concurrently \"npm run server\" \"npm run build\"",
+    "deploy-cluster": "concurrently \"npm run build\" \"npm run cluster\"",
     "test": "npm test --prefix server && npm test --prefix client"
   },
   "repository": {
@@ -26,5 +30,8 @@
   "description": "",
   "devDependencies": {
     "concurrently": "^9.2.0"
+  },
+  "dependencies": {
+    
   }
 }
