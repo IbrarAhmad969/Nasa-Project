@@ -27,10 +27,10 @@ function loadPlanetsData() {
           columns: true,
         })
       )
-      .on("data", async(data) => {
+      .on("data", async (data) => {
         if (isHabitablePlanet(data)) {
           // insert + update = upsert -> so that doc is not created again and again as we restart server. 
-          
+
           await planets.create({
             keplerName: data.kepler_name,
           });
@@ -47,8 +47,9 @@ function loadPlanetsData() {
   });
 }
 
-function getAllPlanets() {
-  return habitablePlanets;
+async function getAllPlanets() {
+  return await planets.find({
+  });
 }
 
 module.exports = {
