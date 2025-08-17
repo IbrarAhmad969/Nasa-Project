@@ -4,13 +4,7 @@ const http = require('http');
 const { loadPlanetsData } = require("./models/planets.model")
 const mongoose = require("mongoose")
 
-
-
-
 const server = http.createServer(app)
-
-
-
 
 async function loadServer() {
     try {

@@ -2,8 +2,8 @@
 const {getAllLaunches, addNewLaunch, existsLaunchWithId, abortLaunchById} = require('../../models/launches.model');
 
 
-function httpGetAllLaunches(req, res){ // Change the data to array. manipulate the data as we want 
-    return res.status(200).json(getAllLaunches());
+async function httpGetAllLaunches(req, res){ // Change the data to array. manipulate the data as we want 
+    return res.status(200).json(await getAllLaunches());
 }
 
 function httpAddNewLaunch(req, res){
