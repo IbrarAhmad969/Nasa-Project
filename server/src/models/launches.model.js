@@ -1,4 +1,5 @@
 const launchesDataBase = require("./launches.mongo");
+const planets = require("./planets.mongo");
 
 
 let latestFlightNumber = 100;
@@ -18,13 +19,23 @@ const launch = {
 
 saveLaunch(launch);
 
+
 async function saveLaunch(launch){
+    const planet = await planets.findOne({
+        keplerName: launch.target,
+    }); // Return JS object only. 
+
+    if(!planet){
+        throw new Error("No Target is Found! ");
+    }
+
     await launchesDataBase.updateOne({ 
-        flightNumber: launch.flightNumber // if the flight no exists, then ignore, if not create
+        flightNumber: launch.flightNumber // if the flight num exists, then ignore, if not create
     }, launch, { // launch 
         upsert: true
     })
 }
+
 
 function existsLaunchWithId(launchId){
     return launchesDataBase.has(launchId);
@@ -55,6 +66,8 @@ function abortLaunchById(launchId){
     return aborted;
 
 }
+
+
 module.exports = {
     getAllLaunches,
     addNewLaunch,
