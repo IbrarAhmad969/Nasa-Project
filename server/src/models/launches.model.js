@@ -28,17 +28,11 @@ async function saveLaunch(launch) {
         throw new Error("No Target is Found! ");
     }
 
-    await launchesDataBase.updateOne({
+    await launchesDataBase.findOneAndUpdate({
         flightNumber: launch.flightNumber // if the flight num exists, then ignore, if not create
     }, launch, { // launch 
         upsert: true
     })
-}
-
-
-function existsLaunchWithId(launchId) {
-    return launchesDataBase.has(launchId);
-
 }
 
 async function getLatestFlightNumber() {
@@ -47,7 +41,7 @@ async function getLatestFlightNumber() {
         '-flightNumber'
     );
 
-    
+
 
     if (!latestLaunch) {
         return DEFAULT_FLIGHT_NUMBER;
@@ -86,21 +80,30 @@ async function scheduleNewLaunch(launch) {
 //     }));
 
 // }
-function abortLaunchById(launchId) {
-    const aborted = launchesDataBase.get(launchId);
-    aborted.upcoming = false;
-    aborted.success = false;
-    return aborted;
 
+async function existsLaunchWithId(launchId) {
+    return await launchesDataBase.findOne({
+        flightNumber: launchId
+    });
+
+}
+
+async function abortLaunchById(launchId) {
+  const aborted = await launchesDataBase.updateOne(
+    { flightNumber: launchId },
+    { $set: { upcoming: false, success: false } }
+  );
+
+  // return true if one document was actually modified
+  return aborted.acknowledged === true && aborted.modifiedCount === 1;
 }
 
 
 module.exports = {
     getAllLaunches,
     scheduleNewLaunch,
-   // addNewLaunch,
+    // addNewLaunch,
     existsLaunchWithId,
-    abortLaunchById,
     abortLaunchById,
 
 }
