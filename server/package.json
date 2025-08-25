@@ -11,6 +11,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "jest": {
+    "testEnvironment": "node"
+  },
   "description": "Nasa Mission Control API",
   "devDependencies": {
     "jest": "^30.0.5",
