@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "start": "nodemon src/index.js",
     "test-start": "jest --start",
     "cluster": "pm2 start src/index.js -i max"

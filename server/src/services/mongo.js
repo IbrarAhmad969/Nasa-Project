@@ -19,6 +19,18 @@ async function mongoConnect() {
         process.exit(1);
     }
 }
+
+async function mongoDisconnect() {
+    try {
+        await mongoose.disconnect();
+        
+    } catch (error) {
+        console.error(error);
+
+    }
+}
+
 module.exports = {
-    mongoConnect
+    mongoConnect, 
+    mongoDisconnect,
 }
