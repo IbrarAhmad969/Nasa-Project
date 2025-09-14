@@ -1,5 +1,6 @@
 const { loadPlanetsData } = require("./models/planets.model");
 const { mongoConnect } = require("./services/mongo");
+const {loadLaunchData} = require("./models/launches.model");
 
 
 async function loadServer() {

@@ -1,22 +1,47 @@
 const launchesDataBase = require("./launches.mongo");
 const planets = require("./planets.mongo");
+const axios = require("axios")
 
 
 const DEFAULT_FLIGHT_NUMBER = 100;
 
 const launch = {
-    flightNumber: 100,
-    missionName: 'Kepler Exploration X',
-    rocket: 'Explorer ISI',
-    launchDate: new Date('Dec 27, 2030'),
-    target: 'Kepler-442 b',
-    customer: ['ZTM', 'NASA'],
-    upcoming: true,
-    success: true,
+    flightNumber: 100, // flight number from API
+    missionName: 'Kepler Exploration X', // name from API, launch response 
+    rocket: 'Explorer ISI', // Rocket.name
+    launchDate: new Date('Dec 27, 2030'), // date local 
+    target: 'Kepler-442 b', // 
+    customer: ['ZTM', 'NASA'], // payload.customers for each payload
+    upcoming: true, // upcoming
+    success: true, // success 
 
 };
 
 saveLaunch(launch);
+
+const SPACE_X_API_URL = "https://api.spacexdata.com/v5/launches/latest";
+async function loadLaunchesData() {
+    console.log("Downloading launches data...");
+    await axios.post(SPACE_X_API_URL, {
+        query: {},
+        options: {
+            populate: [
+                {
+                    path: 'rocket',
+                    select: {
+                        name: 1
+                    }
+                },
+                {
+                    path: 'payload',
+                    select: {
+                        'customer': 1
+                    }
+                }
+            ]
+        }
+    });
+}
 
 
 async function saveLaunch(launch) {
@@ -89,21 +114,21 @@ async function existsLaunchWithId(launchId) {
 }
 
 async function abortLaunchById(launchId) {
-  const aborted = await launchesDataBase.updateOne(
-    { flightNumber: launchId },
-    { $set: { upcoming: false, success: false } }
-  );
+    const aborted = await launchesDataBase.updateOne(
+        { flightNumber: launchId },
+        { $set: { upcoming: false, success: false } }
+    );
 
-  // return true if one document was actually modified
-  return aborted.acknowledged === true && aborted.modifiedCount === 1;
+    // return true if one document was actually modified
+    return aborted.acknowledged === true && aborted.modifiedCount === 1;
 }
 
 
 module.exports = {
     getAllLaunches,
     scheduleNewLaunch,
-    // addNewLaunch,
     existsLaunchWithId,
     abortLaunchById,
+    loadLaunchesData,
 
 }
