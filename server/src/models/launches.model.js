@@ -11,7 +11,7 @@ const launch = {
     rocket: 'Explorer ISI', // Rocket.name
     launchDate: new Date('Dec 27, 2030'), // date local 
     target: 'Kepler-442 b', // 
-    customer: ['ZTM', 'NASA'], // payload.customers for each payload
+    customers: ['ZTM', 'NASA'], // payload.customers for each payload
     upcoming: true, // upcoming
     success: true, // success 
 
@@ -19,10 +19,11 @@ const launch = {
 
 saveLaunch(launch);
 
-const SPACE_X_API_URL = "https://api.spacexdata.com/v5/launches/latest";
+const SPACE_X_API_URL = "https://api.spacexdata.com/v4/launches/query";
+
 async function loadLaunchesData() {
     console.log("Downloading launches data...");
-    await axios.post(SPACE_X_API_URL, {
+     const response = await axios.post(SPACE_X_API_URL, {
         query: {},
         options: {
             populate: [
@@ -33,14 +34,32 @@ async function loadLaunchesData() {
                     }
                 },
                 {
-                    path: 'payload',
+                    path: 'payloads',
                     select: {
-                        'customer': 1
+                        'customers': 1
                     }
                 }
             ]
         }
     });
+    const launchDocs = response.data.docs;
+    for(const launchDoc of launchDocs){
+        const payloads = launchDoc['payloads'];
+        const customers = payloads.flatMap((payload)=>{
+            return payload['customer'];
+        })
+        const launch = {
+            flightNumber: launchDoc['flight_number'],
+            mission: launchDoc['name'],
+            rocket: launchDoc['rocket']['name'],
+            launchDate: launchDoc['date_local'],
+            upcoming: launchDoc['upcoming'],
+            success: launchDoc['success'],
+            customers,
+        }
+
+        console.log(`${launch.flightNumber}`)
+    }
 }
 
 
