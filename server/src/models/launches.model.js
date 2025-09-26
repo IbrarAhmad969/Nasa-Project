@@ -1,4 +1,5 @@
 const launchesDataBase = require("./launches.mongo");
+
 const planets = require("./planets.mongo");
 const axios = require("axios")
 
@@ -11,7 +12,7 @@ const launch = {
     rocket: 'Explorer ISI', // Rocket.name
     launchDate: new Date('Dec 27, 2030'), // date local 
     target: 'Kepler-442 b', // 
-    customers: ['ZTM', 'NASA'], // payload.customers for each payload
+    customers: ['ZTM', 'NASA'],
     upcoming: true, // upcoming
     success: true, // success 
 
@@ -21,11 +22,14 @@ saveLaunch(launch);
 
 const SPACE_X_API_URL = "https://api.spacexdata.com/v4/launches/query";
 
-async function loadLaunchesData() {
+async function populateLaunches() {
     console.log("Downloading launches data...");
-     const response = await axios.post(SPACE_X_API_URL, {
+
+    const response = await axios.post(SPACE_X_API_URL, {
+
         query: {},
         options: {
+            pagination: false,
             populate: [
                 {
                     path: 'rocket',
@@ -42,10 +46,17 @@ async function loadLaunchesData() {
             ]
         }
     });
+
+    if (response !== 200) {
+        console.log("problem downloading launch data")
+        throw new Error("Launch Data Download failed!");
+    }
+
+
     const launchDocs = response.data.docs;
-    for(const launchDoc of launchDocs){
+    for (const launchDoc of launchDocs) {
         const payloads = launchDoc['payloads'];
-        const customers = payloads.flatMap((payload)=>{
+        const customers = payloads.flatMap((payload) => {
             return payload['customer'];
         })
         const launch = {
@@ -59,18 +70,33 @@ async function loadLaunchesData() {
         }
 
         console.log(`${launch.flightNumber}`)
+        await saveLaunch(launch);
+
+    }
+}
+
+
+async function loadLaunchesData() {
+
+
+    // reducing load, by this query, if first launch already exists. 
+
+    const firstLaunch = await findLaunch({
+        flightNumber: 1,
+        rocket: "Falcon 1",
+        mission: 'FalconSat',
+
+    })
+
+    if (firstLaunch) {
+        console.log("launch Data is already loaded! ");
+    } else {
+        await populateLaunches();
     }
 }
 
 
 async function saveLaunch(launch) {
-    const planet = await planets.findOne({
-        keplerName: launch.target,
-    }); // Return JS object only. 
-
-    if (!planet) {
-        throw new Error("No Target is Found! ");
-    }
 
     await launchesDataBase.findOneAndUpdate({
         flightNumber: launch.flightNumber // if the flight num exists, then ignore, if not create
@@ -100,6 +126,14 @@ async function getAllLaunches() {
 }
 
 async function scheduleNewLaunch(launch) {
+    const planet = await planets.findOne({
+        keplerName: launch.target,
+    }); // Return JS object only. 
+
+    if (!planet) {
+        throw new Error("No Target is Found! ");
+    }
+
     const newFlightNumber = await getLatestFlightNumber() + 1;
 
     const newLaunch = Object.assign(launch, {
@@ -112,21 +146,14 @@ async function scheduleNewLaunch(launch) {
     await saveLaunch(newLaunch);
 }
 
-// function addNewLaunch(launch) {
+// turn on Pagination will overload server, now reduce the load by writing a function. 
 
-//     latestFlightNumber++;
-//     launchesDataBase.set(latestFlightNumber, Object.assign(launch, {
-
-//         upcoming: true,
-//         success: true,
-//         customers: ['Zero to Mastery', 'NASA'],
-//         flightNumber: latestFlightNumber,
-//     }));
-
-// }
+async function findLaunch(filter) {
+    return await launchesDataBase.findOne(filter);
+}
 
 async function existsLaunchWithId(launchId) {
-    return await launchesDataBase.findOne({
+    return await findLaunch({
         flightNumber: launchId
     });
 
