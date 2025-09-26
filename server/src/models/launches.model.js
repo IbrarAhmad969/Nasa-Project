@@ -123,6 +123,8 @@ async function getLatestFlightNumber() {
 async function getAllLaunches() {
     return await launchesDataBase
         .find({}, { '_id': 0, '__v': 0 })
+        .skip(20)
+        .limit(50)
 }
 
 async function scheduleNewLaunch(launch) {

@@ -3,6 +3,7 @@ const {getAllLaunches, scheduleNewLaunch, existsLaunchWithId, abortLaunchById} =
 
 
 async function httpGetAllLaunches(req, res){ // Change the data to array. manipulate the data as we want 
+    console.log(req.params)
     return res.status(200).json(await getAllLaunches());
 }
 
